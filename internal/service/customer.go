@@ -1,9 +1,9 @@
 package service
 
 import (
+	"blog-service/internal/model"
 	"crypto/md5"
 	"encoding/hex"
-	"blog-service/internal/model"
 	"strings"
 
 	"github.com/bilibili/kratos/pkg/ecode"
@@ -66,6 +66,7 @@ func Login(ctx *bm.Context, s *Service, c *model.Customer) (err error) {
 	return
 }
 
+//用户注册
 func Regist(ctx *bm.Context, s *Service, c *model.Customer) {
 	if len(c.Passwd) < 1 || len(c.Phone) < 1 {
 		log.Warn("Customer Regist got invalid input param: %s : %s", c.Phone, c.Passwd)
