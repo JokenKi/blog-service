@@ -3,9 +3,9 @@ package http
 import (
 	"net/http"
 
-	"go-common/library/ecode"
 	"blog-service/internal/model"
 	"blog-service/internal/service"
+	"go-common/library/ecode"
 
 	"github.com/bilibili/kratos/pkg/conf/paladin"
 	"github.com/bilibili/kratos/pkg/log"
@@ -49,6 +49,10 @@ func initRouter(e *bm.Engine) {
 		c.GET("/login", login)
 		c.POST("/regist", regist)
 	}
+	b := e.Group("/blog")
+	{
+		b.POST("/publish", publishBlog)
+	}
 }
 
 func ping(ctx *bm.Context) {
@@ -85,6 +89,14 @@ func regist(ctx *bm.Context) {
 		return
 	}
 	service.Regist(ctx, svc, c)
+}
+
+func publishBlog(ctx *bm.Context) {
+	c := &model.Blog{}
+	if err := ctx.Bind(c); err != nil {
+		return
+	}
+	service.PublishBlog(ctx, svc, c)
 }
 
 func preLogin(c *model.Customer) (invalid bool) {
