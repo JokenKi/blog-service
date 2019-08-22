@@ -48,6 +48,7 @@ func initRouter(e *bm.Engine) {
 	{
 		c.GET("/login", login)
 		c.POST("/regist", regist)
+		c.POST("/changePasswd", changePasswd)
 	}
 	b := e.Group("/blog")
 	{
@@ -97,6 +98,14 @@ func publishBlog(ctx *bm.Context) {
 		return
 	}
 	service.PublishBlog(ctx, svc, c)
+}
+
+func changePasswd(ctx *bm.Context) {
+	c := &model.Customer{}
+	if err := ctx.Bind(c); err != nil {
+		return
+	}
+	service.ChangePasswd(ctx, svc, c)
 }
 
 func preLogin(c *model.Customer) (invalid bool) {

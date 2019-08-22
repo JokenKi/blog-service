@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"context"
 	"blog-service/internal/model"
+	"context"
 
 	"github.com/bilibili/kratos/pkg/log"
 )
@@ -12,6 +12,8 @@ const _getUserByNameSQL = "SELECT c.id,c.`name`,c.nick_name,c.passwd,c.salt,c.ph
 const _insertUserSQL = "INSERT INTO `tb_customer` (`name`,`nick_name`,`passwd`,`salt`,`phone`,`account_type`,`status`,`time_create`,`time_update`)VALUES(?, ?,?,?,?,?,?,?,?)"
 
 const _countUserByNameSQL = "SELECT COUNT(id) FROM tb_customer WHERE NAME = ?"
+
+const _updatePasswdSQL = "UPDATE tb_customer SET passwd = ?,time_update=? WHERE NAME = ?"
 
 //根据用户名称获取用户信息
 func (d *Dao) GetUserByName(ctx context.Context, username string) (cus *model.Customer) {
@@ -41,4 +43,14 @@ func (d *Dao) InsertUser(ctx context.Context, cus *model.Customer) int64 {
 	id, err := res.LastInsertId()
 	checkErr(err)
 	return id
+}
+
+//更新用户密码
+func (d *Dao) UpdatePasswd(ctx context.Context, cus *model.Customer) int64 {
+	stmt := d.db.Prepared(_updatePasswdSQL)
+	res, err := stmt.Exec(ctx, &cus.NewPasswd, &cus.TimeUpdate, &cus.Name)
+	checkErr(err)
+	rows, err := res.RowsAffected()
+	checkErr(err)
+	return rows
 }

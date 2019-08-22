@@ -102,3 +102,36 @@ func Regist(ctx *bm.Context, s *Service, c *model.Customer) {
 	s.dao.InsertUser(ctx, c)
 	ctx.JSON(c.Id, ecode.OK)
 }
+
+//改密码
+func ChangePasswd(ctx *bm.Context, s *Service, c *model.Customer) {
+	if len(c.Name) < 1 || len(c.NewPasswd) < 1 || len(c.Passwd) < 1 {
+		log.Warn("Customer ChangePasswd got invalid input param NewPasswd: %s Passwd: %s", c.NewPasswd, c.Passwd)
+		ctx.JSON(nil, ecode.RequestErr)
+		return
+	}
+	cus := s.dao.GetUserByName(ctx, c.Name)
+	if nil == cus {
+		log.Warn("Customer ChangePasswd user : %s doesn't exist！", c.Name)
+		ctx.JSON(nil, ecode.RequestErr)
+		return
+	}
+	if !CheckPasswd(c.Passwd, cus) {
+		log.Warn("Customer ChangePasswd password check failed, name: %s password: ", c.Name, c.Passwd)
+		ctx.JSON(nil, ecode.RequestErr)
+		return
+	}
+	nowTimestamp := time.Now().Unix()
+	md5Str := GetMd5(cus.Salt, c.NewPasswd)
+	c.NewPasswd = md5Str
+	c.TimeUpdate = nowTimestamp
+	s.dao.UpdatePasswd(ctx, c)
+	cus.Passwd = md5Str
+	token := s.dao.GetCustomerToken(ctx, cus.Id)
+	expire := 604800
+	if len(token) < 0 {
+		token = strings.ToUpper(uuid.Must(uuid.NewV4()).String())
+	}
+	s.dao.SetCustomerToken(ctx, cus.Id, token, expire)
+	s.dao.SetCustomerToCache(ctx, token, cus, expire)
+}

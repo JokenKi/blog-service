@@ -11,6 +11,7 @@ type Customer struct {
 	Name            string `json:"name"`
 	NickName        string `json:"nickName"`
 	Passwd          string `json:"passwd"`
+	NewPasswd       string `json:"newPasswd"` //新密码,用户改密时使用
 	Salt            int32  `json:"salt"`
 	Phone           string `json:"phone"`
 	AccountType     int16  `json:"accountType"`
