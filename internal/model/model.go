@@ -31,4 +31,5 @@ type Blog struct {
 	Status     int16  `json:"status"`
 	TimeCreate int64  `json:"timeCreate"`
 	TimeUpdate int64  `json:"timeUpdate"`
+	Token      string `json:"token"`
 }

@@ -19,7 +19,17 @@ const _updatePasswdSQL = "UPDATE tb_customer SET passwd = ?,time_update=? WHERE 
 func (d *Dao) GetUserByName(ctx context.Context, username string) (cus *model.Customer) {
 	cus = &model.Customer{}
 	row := d.db.QueryRow(ctx, _getUserByNameSQL, username)
-	if err := row.Scan(&cus.Id, &cus.Name, &cus.NickName, &cus.Passwd, &cus.Salt, &cus.Phone, &cus.AccountType, &cus.Status, &cus.TimeCreate, &cus.TimeUpdate, &cus.TimeLatestLogin); err != nil {
+	if err := row.Scan(&cus.Id,
+		&cus.Name,
+		&cus.NickName,
+		&cus.Passwd,
+		&cus.Salt,
+		&cus.Phone,
+		&cus.AccountType,
+		&cus.Status,
+		&cus.TimeCreate,
+		&cus.TimeUpdate,
+		&cus.TimeLatestLogin); err != nil {
 		cus = nil
 		log.Error("row.Scan error(%v)", err)
 		return

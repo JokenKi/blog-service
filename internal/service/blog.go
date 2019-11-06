@@ -29,3 +29,17 @@ func PublishBlog(ctx *bm.Context, s *Service, c *model.Blog) {
 	s.dao.InsertBlog(ctx, c)
 	ctx.JSON(c.Id, ecode.OK)
 }
+
+//加载用户博客到缓存
+func LoadUserBlogs(ctx *bm.Context, s *Service) {
+	blogs := s.dao.SelectAllBlogs(ctx)
+	bLen := blogs.Len()
+	if bLen == 0 {
+		return
+	}
+	for i := blogs.Front(); i != nil; i = i.Next() {
+		v := i.Value.(*model.Blog)
+		s.dao.AddToCache(ctx, v, v.CustomerId)
+	}
+	ctx.JSON(nil, ecode.OK)
+}

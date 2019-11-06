@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/bilibili/kratos/pkg/cache/memcache"
@@ -23,6 +24,7 @@ type Dao struct {
 
 func checkErr(err error) {
 	if err != nil {
+		fmt.Println("redis set failed:", err)
 		panic(err)
 	}
 }

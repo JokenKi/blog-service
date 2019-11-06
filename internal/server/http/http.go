@@ -31,6 +31,7 @@ func New(s *service.Service) (engine *bm.Engine) {
 	svc = s
 	engine = bm.DefaultServer(hc.Server)
 	initRouter(engine)
+	initDataLoadRouter(engine)
 	if err := engine.Start(); err != nil {
 		panic(err)
 	}
