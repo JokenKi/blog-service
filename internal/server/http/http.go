@@ -32,10 +32,14 @@ func New(s *service.Service) (engine *bm.Engine) {
 	engine = bm.DefaultServer(hc.Server)
 	initRouter(engine)
 	initDataLoadRouter(engine)
+	initApiRouter(engine)
 	if err := engine.Start(); err != nil {
 		panic(err)
 	}
 	return
+}
+func paramError(ctx *bm.Context) {
+	ctx.JSON("参数错误", ecode.RequestErr)
 }
 
 func initRouter(e *bm.Engine) {

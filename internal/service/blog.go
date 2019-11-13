@@ -43,3 +43,12 @@ func LoadUserBlogs(ctx *bm.Context, s *Service) {
 	}
 	ctx.JSON(nil, ecode.OK)
 }
+
+//从缓存获取用户博客
+func GetUserBlogs(ctx *bm.Context,
+	s *Service,
+	userId int64,
+	pageNum int,
+	pageSize int) {
+	s.dao.SelectAllBlogsFromCache(ctx, userId, pageNum, pageSize)
+}

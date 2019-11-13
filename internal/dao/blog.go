@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/bilibili/kratos/pkg/log"
@@ -73,4 +74,19 @@ func (d *Dao) SelectAllBlogs(c context.Context) (blogs *list.List) {
 	}
 	log.Infov(c, log.KV("event", "mysql_query"), log.KV("row_num", blogs.Len()), log.KV("sql", querySQL))
 	return
+}
+
+func (d *Dao) SelectAllBlogsFromCache(ctx context.Context, userId int64,
+	pageNum int,
+	pageSize int) (blogs *list.List) {
+	conn := d.redis.Get(ctx)
+	defer conn.Close()
+	// 读取指定zset
+	user_map, err := conn.Do("ZRANGE", _BPS_BLOG_USER_LIST_ZSET+strconv.FormatInt(int64(userId), 10), pageNum-1, pageSize-1, "withscores")
+	if err != nil {
+		fmt.Println("redis get failed:", err)
+	} else {
+		fmt.Printf("Get mykey: %v \n", user_map)
+	}
+	return nil
 }
