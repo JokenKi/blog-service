@@ -50,5 +50,6 @@ func getUserBlogs(ctx *bm.Context) {
 		}
 	}
 
-	service.GetUserBlogs(ctx, svc, userIdInt64, pageNumInt, pageSizeInt)
+	result := service.GetUserBlogs(ctx, svc, userIdInt64, pageNumInt, pageSizeInt)
+	ctx.JSON(result, ecode.OK)
 }

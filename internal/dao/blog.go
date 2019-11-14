@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/bilibili/kratos/pkg/cache/redis"
 	"github.com/bilibili/kratos/pkg/log"
 )
 
@@ -82,11 +83,25 @@ func (d *Dao) SelectAllBlogsFromCache(ctx context.Context, userId int64,
 	conn := d.redis.Get(ctx)
 	defer conn.Close()
 	// 读取指定zset
-	user_map, err := conn.Do("ZRANGE", _BPS_BLOG_USER_LIST_ZSET+strconv.FormatInt(int64(userId), 10), pageNum-1, pageSize-1, "withscores")
+	user_map, err := conn.Do("ZREVRANGE", _BPS_BLOG_USER_LIST_ZSET+strconv.FormatInt(int64(userId), 10), (pageNum-1)*pageSize, pageSize-1, "WITHSCORES")
 	if err != nil {
 		fmt.Println("redis get failed:", err)
+		return nil
 	} else {
-		fmt.Printf("Get mykey: %v \n", user_map)
+		result, err := redis.StringMap(user_map, nil)
+		if err != nil {
+			panic(err)
+		}
+		for r := range result {
+			blog := new(model.Blog)
+			fmt.Printf("user name: %v %v\n", r, result[r])
+			json.Unmarshal([]byte(r), blog)
+			if blogs == nil {
+				blogs = list.New()
+			}
+			log.Info("id %v", blog.Id)
+			blogs.PushBack(blog)
+		}
+		return blogs
 	}
-	return nil
 }
