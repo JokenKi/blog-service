@@ -11,6 +11,7 @@ import (
 
 	"github.com/bilibili/kratos/pkg/cache/redis"
 	"github.com/bilibili/kratos/pkg/log"
+	"github.com/bitly/go-simplejson"
 )
 
 const _insertBlogSQL = "INSERT INTO `tb_blog` ( `customer_id`, `type_id`, `blog_title`, `content`, `read_num`, `status`, `time_create`, `time_update`) VALUES (?,?,?,?,?,?,?,?)"
@@ -79,7 +80,7 @@ func (d *Dao) SelectAllBlogs(c context.Context) (blogs *list.List) {
 
 func (d *Dao) SelectAllBlogsFromCache(ctx context.Context, userId int64,
 	pageNum int,
-	pageSize int) (blogs *list.List) {
+	pageSize int) (res map[string]interface{}) {
 	conn := d.redis.Get(ctx)
 	defer conn.Close()
 	// 读取指定zset
@@ -92,16 +93,15 @@ func (d *Dao) SelectAllBlogsFromCache(ctx context.Context, userId int64,
 		if err != nil {
 			panic(err)
 		}
+		res = make(map[string]interface{})
+		var blogs []map[string]interface{}
 		for r := range result {
-			blog := new(model.Blog)
-			fmt.Printf("user name: %v %v\n", r, result[r])
-			json.Unmarshal([]byte(r), blog)
-			if blogs == nil {
-				blogs = list.New()
-			}
-			log.Info("id %v", blog.Id)
-			blogs.PushBack(blog)
+			//				fmt.Printf("user blog: %v %v\n", r, result[r])
+			cn_json, _ := simplejson.NewJson([]byte(r))
+			newJson, _ := cn_json.Map()
+			blogs = append(blogs, newJson)
 		}
-		return blogs
+		res["data"] = blogs
+		return res
 	}
 }

@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+
+	"github.com/bitly/go-simplejson"
 )
 
 type A struct{}
@@ -34,7 +37,7 @@ func (p *B) Show2() { // 名称也是Show2 (属于结构体函数, 可以这样�
 	fmt.Println("BBB")
 }
 
-func main() {
+func testObject() {
 	b := &B{}
 	b.Show() // 相当于b先访问了自己的匿名字段A, A再调用Show()
 
@@ -64,4 +67,37 @@ func main() {
 	s5.id = 2
 	s5.addr = "wz"
 	fmt.Println(s5)
+}
+
+func main() {
+	testJson()
+}
+
+func testJson() {
+	//拼凑json body为map数组
+	var rbody []map[string]interface{}
+	t := make(map[string]interface{})
+	t["device_id"] = "dddddd"
+	t["device_hid"] = "ddddddd"
+	rbody = append(rbody, t)
+	t1 := make(map[string]interface{})
+	t1["device_id"] = "aaaaa"
+	t1["device_hid"] = "aaaaa"
+	rbody = append(rbody, t1)
+	cnnJson := make(map[string]interface{})
+	cnnJson["code_msg"] = ""
+	cnnJson["body"] = rbody
+	cnnJson["page"] = 0
+	cnnJson["page_size"] = 0
+	b, _ := json.Marshal(cnnJson)
+	cnnn := string(b)
+	fmt.Println("cnnn:%s", cnnn)
+	cn_json, _ := simplejson.NewJson([]byte(cnnn))
+	cn_body, _ := cn_json.Get("body").Array()
+	for _, di := range cn_body { //就在这里对di进行类型判断
+		newdi, _ := di.(map[string]interface{})
+		device_id := newdi["device_id"]
+		device_hid := newdi["device_hid"]
+		fmt.Println(device_hid, device_id)
+	}
 }

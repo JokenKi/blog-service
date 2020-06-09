@@ -2,7 +2,6 @@ package service
 
 import (
 	"blog-service/internal/model"
-	"container/list"
 
 	"github.com/bilibili/kratos/pkg/ecode"
 
@@ -50,7 +49,7 @@ func GetUserBlogs(ctx *bm.Context,
 	s *Service,
 	userId int64,
 	pageNum int,
-	pageSize int) (blogs *list.List) {
-	blogs = s.dao.SelectAllBlogsFromCache(ctx, userId, pageNum, pageSize)
-	return blogs
+	pageSize int) (res map[string]interface{}) {
+	res = s.dao.SelectAllBlogsFromCache(ctx, userId, pageNum, pageSize)
+	return res
 }

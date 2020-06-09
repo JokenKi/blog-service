@@ -51,5 +51,5 @@ func getUserBlogs(ctx *bm.Context) {
 	}
 
 	result := service.GetUserBlogs(ctx, svc, userIdInt64, pageNumInt, pageSizeInt)
-	ctx.JSON(result, ecode.OK)
+	ctx.JSONMap(result, ecode.OK)
 }
